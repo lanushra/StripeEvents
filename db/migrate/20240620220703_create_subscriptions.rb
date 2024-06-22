@@ -3,6 +3,7 @@ class CreateSubscriptions < ActiveRecord::Migration[7.1]
     create_table :subscriptions do |t|
       t.string :name
       t.integer :status, default: 0, null: false
+      t.string :subscription_stripe_id
 
       t.timestamps
     end

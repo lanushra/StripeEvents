@@ -5,24 +5,6 @@ class SubscriptionsController < ApplicationController
         @subscriptions = Subscription.all
     end
 
-    # def create
-    #     @subscription = customer.subscription.created
-    #     if @subscription.save
-    #         puts "sucessful"
-    #     else
-    #         puts "failed"
-    #     end
-    # end
-
-
-    def update
-        if @subscription.update(subscription_params)
-            puts "sucessful"
-        else
-            puts "failed"
-        end
-    end
-
     def new; end
 
     def create
@@ -32,9 +14,9 @@ class SubscriptionsController < ApplicationController
       begin
         case event.type
         when 'customer.subscription.created'
-          handle_payment_succeeded(event.data.object)
-        else
-          raise "Unhandled event type: #{event.type}"
+          create_subscription(event.data.object)
+        when 'invoice.paid'
+          update_subscription(event.data.object)
         end
       rescue StandardError => e
         render json: { error: e.message }, status: :unprocessable_entity
@@ -46,16 +28,19 @@ class SubscriptionsController < ApplicationController
 
     private
 
-    def handle_payment_succeeded(my_data)
-        subscription = my_data
-
-        Subscription.create(
-            name: "Sub1",
-            status: 0,
-        )
+    def create_subscription(my_data)
+      Subscription.create(
+        name: "Sub1",
+        status: 0,
+        subscription_stripe_id: my_data.items.first.subscription
+      )
     end
 
-    def subscription_params
-        params.require(:subscription).permit(:name)
-    end
+    def update_subscription(my_data)
+      subscription = my_data.lines.first.subscription
+      search_with_stripe_id = Subscription.find_by_subscription_stripe_id(subscription)
+      search_with_stripe_id.update(
+        status: 1,
+      )
+  end
 end
