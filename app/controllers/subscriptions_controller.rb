@@ -42,5 +42,5 @@ class SubscriptionsController < ApplicationController
       search_with_stripe_id.update(
         status: 1,
       )
-  end
+    end
 end
