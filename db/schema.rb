@@ -16,6 +16,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_20_220703) do
 
   create_table "subscriptions", force: :cascade do |t|
     t.string "name"
+    t.integer "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
