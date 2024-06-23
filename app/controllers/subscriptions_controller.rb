@@ -17,6 +17,8 @@ class SubscriptionsController < ApplicationController
           create_subscription(event.data.object)
         when 'invoice.paid'
           update_subscription(event.data.object)
+        when 'customer.subscription.deleted'
+          update_to_cancel(event.data.object)
         end
       rescue StandardError => e
         render json: { error: e.message }, status: :unprocessable_entity
@@ -42,5 +44,13 @@ class SubscriptionsController < ApplicationController
       search_with_stripe_id.update(
         status: 1,
       )
+    end
+
+    def update_to_cancel(my_data)
+      subscription = my_data.items.first.subscription
+      search_with_stripe_id = Subscription.find_by_subscription_stripe_id(subscription)
+      if search_with_stripe_id.status == "paid"
+        search_with_stripe_id.update(status: 2)
+      end
     end
 end
