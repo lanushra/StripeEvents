@@ -1,10 +1,6 @@
 class SubscriptionsController < ApplicationController
   skip_before_action :verify_authenticity_token
 
-    def index
-        @subscriptions = Subscription.all
-    end
-
     def new; end
 
     def create
@@ -32,7 +28,7 @@ class SubscriptionsController < ApplicationController
 
     def create_subscription(my_data)
       Subscription.create(
-        name: "Sub1",
+        name: "Subscription",
         status: 0,
         subscription_stripe_id: my_data.items.first.subscription
       )
@@ -51,6 +47,8 @@ class SubscriptionsController < ApplicationController
       search_with_stripe_id = Subscription.find_by_subscription_stripe_id(subscription)
       if search_with_stripe_id.status == "paid"
         search_with_stripe_id.update(status: 2)
+      else
+        puts "Only Paid Subscriptions can be cancelled"
       end
     end
 end
