@@ -20,5 +20,7 @@ The endpoint is created using ngrok since it is running on a local machine.
 How to run the application ?
 
 run `rails s -p 4242`
+
 run `ngrok http http://localhost:4242`
+
 run `stripe listen`
